@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Companiio</string>
+    <string name="title_activity_main">Companiio</string>
+    <string name="package_name">com.companiio.app</string>
+    <string name="custom_url_scheme">com.companiio.app</string>
+</resources>

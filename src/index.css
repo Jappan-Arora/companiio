@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
+    --primary: 14 100% 64%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 20% 96%;
+    --secondary-foreground: 240 10% 10%;
+    --muted: 240 10% 96%;
+    --muted-foreground: 240 5% 46%;
+    --accent: 240 20% 96%;
+    --accent-foreground: 240 10% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 10% 90%;
+    --input: 240 10% 90%;
+    --ring: 14 100% 64%;
+    --radius: 0.75rem;
+    --coral: #FF6B4A;
+    --coral-light: #FF8F6B;
+    --coral-dark: #E55A3A;
+    --navy: #1A1A2E;
+  }
+
+  * { @apply border-border; }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+}
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-xl bg-white/70 border border-white/20;
+  }
+  .glass-dark {
+    @apply backdrop-blur-xl bg-black/40 border border-white/10;
+  }
+  .glass-strong {
+    @apply backdrop-blur-2xl bg-white/80 border border-white/30 shadow-lg;
+  }
+  .glass-card {
+    @apply backdrop-blur-lg bg-white/60 border border-white/25 rounded-2xl shadow-xl;
+  }
+  .glass-card-dark {
+    @apply backdrop-blur-lg bg-black/50 border border-white/15 rounded-2xl shadow-xl;
+  }
+  .glass-button {
+    @apply backdrop-blur-md bg-white/20 border border-white/30 rounded-full text-white font-medium
+    hover:bg-white/30 transition-all duration-300 active:scale-95;
+  }
+  .glass-input {
+    @apply backdrop-blur-sm bg-white/15 border border-white/20 rounded-xl px-4 py-3
+    text-white placeholder:text-white/50 outline-none
+    focus:bg-white/25 focus:border-white/40 transition-all;
+  }
+  .glass-input-dark {
+    @apply backdrop-blur-sm bg-gray-900/10 border border-gray-200/50 rounded-xl px-4 py-3
+    text-gray-900 placeholder:text-gray-400 outline-none
+    focus:bg-gray-900/5 focus:border-[#FF6B4A]/40 transition-all;
+  }
+  .glass-nav {
+    @apply backdrop-blur-2xl bg-white/80 border-b border-white/20;
+  }
+  .glass-nav-transparent {
+    @apply backdrop-blur-sm bg-black/20 border-b border-white/5;
+  }
+  .text-coral-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#FF6B4A] to-[#FF8F6B];
+  }
+  .bg-coral-gradient {
+    @apply bg-gradient-to-r from-[#FF6B4A] to-[#FF8F6B];
+  }
+  .shadow-coral {
+    box-shadow: 0 4px 20px rgba(255,107,74,0.35);
+  }
+  .shadow-glass {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  .hover-lift {
+    @apply transition-all duration-300 ease-out hover:-translate-y-1;
+  }
+  .hover-lift:hover {
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulseGlow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,107,74,0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(255,107,74,0); }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+.animate-slide-in { animation: slideIn 0.4s ease-out forwards; }
+.animate-pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+
+@media (min-width: 768px) {
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+}
