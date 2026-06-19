@@ -1,13 +1,12 @@
 import { useParams, useNavigate } from 'react-router'
 import { useCart } from '@/hooks/useCart'
-import { trpc } from '@/providers/trpc'
 import { Button } from '@/components/ui/button'
 import {
   MapPin, Star, Phone, Globe, Check, Calendar, ChevronLeft,
   Share2, Instagram, Mail, Ticket, ShoppingBag, Target,
   Clock, Users,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { mockVenues, mockDeals, getCancellationInfo } from '@/lib/mockData'
 
 export default function VenueDetail() {
@@ -15,10 +14,16 @@ export default function VenueDetail() {
   const navigate = useNavigate()
   const { addItem, removeItem, isInCart } = useCart()
   const [copied, setCopied] = useState(false)
-  const { data: apiVenue, isLoading } = trpc.venue.getBySlug.useQuery({ slug: slug || '' }, { enabled: !!slug })
+  const [ready, setReady] = useState(false)
+
+  // Instant render — no backend wait
+  useEffect(() => {
+    const t = setTimeout(() => setReady(true), 100)
+    return () => clearTimeout(t)
+  }, [slug])
 
   const mockVenue = slug ? mockVenues.find(v => v.slug === slug) : null
-  const venue = apiVenue || (mockVenue ? {
+  const venue = mockVenue ? {
     ...mockVenue,
     priceRange: '$'.repeat(mockVenue.priceLevel),
     cuisineType: mockVenue.cuisine,
@@ -26,7 +31,26 @@ export default function VenueDetail() {
     acceptsReservations: true,
     gallery: [mockVenue.image],
     deals: mockDeals.filter(d => d.venueId === mockVenue.id),
-  } as any : null)
+  } as any : null
+
+  if (!ready) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-[#FF6B4A] border-t-transparent" />
+      </div>
+    )
+  }
+
+  if (!venue) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">Venue not found</h2>
+          <Button onClick={() => navigate('/discover')} className="bg-[#FF6B4A] rounded-full">Browse</Button>
+        </div>
+      </div>
+    )
+  }
 
   const handleShare = async () => {
     if (navigator.share && venue) {
@@ -48,22 +72,18 @@ export default function VenueDetail() {
       venueId: venue.id,
       venueName: venue.name,
       venueSlug: venue.slug,
-      venueImage: venue.image || venue.photoUrl || '',
+      venueImage: venue.image || '',
       venueCity: venue.city || venue.neighborhood || '',
       venueCategory: venue.cuisine || venue.subcategories?.[0] || 'Venue',
       priceLevel: venue.priceLevel || 2,
     })
   }
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><div className="animate-spin rounded-full h-10 w-10 border-4 border-[#FF6B4A] border-t-transparent" /></div>
-  if (!venue) return <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]"><div className="text-center"><h2 className="text-xl font-semibold text-gray-700 mb-2">Venue not found</h2><Button onClick={() => navigate('/discover')} className="bg-[#FF6B4A] rounded-full">Browse</Button></div></div>
-
   const gallery = venue.gallery as string[] || [venue.image]
   const inCart = isInCart(venue.id)
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      {/* Hero Image */}
       <div className="relative h-[45vh] sm:h-[55vh]">
         <img src={venue.image || ''} alt={venue.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -108,7 +128,6 @@ export default function VenueDetail() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-6 relative z-10">
         <div className="glass-strong rounded-2xl p-5 sm:p-6 shadow-glass">
-          {/* Rating & Tags */}
           <div className="flex flex-wrap items-center gap-4 mb-6 pb-6 border-b border-gray-100">
             <div className="flex items-center gap-2 bg-amber-50 rounded-full px-3 py-1.5">
               <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
@@ -116,20 +135,16 @@ export default function VenueDetail() {
               <span className="text-sm text-gray-500">({venue.reviewCount})</span>
             </div>
             {venue.cuisineType && <span className="text-sm bg-gray-50 rounded-full px-3 py-1.5">{venue.cuisineType}</span>}
-            {venue.avgCostPerPerson && <span className="text-sm bg-gray-50 rounded-full px-3 py-1.5">~${venue.avgCostPerPerson}/person</span>}
-            {venue.dressCode && <span className="text-sm bg-gray-50 rounded-full px-3 py-1.5">{venue.dressCode}</span>}
             <span className="text-sm bg-[#FF6B4A]/10 text-[#FF6B4A] rounded-full px-3 py-1.5 flex items-center gap-1">
               <Users className="w-3.5 h-3.5" /> {venue.bookedToday || 5} booked today
             </span>
           </div>
 
-          {/* About */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-[#1A1A2E] mb-2">About</h2>
             <p className="text-gray-600 leading-relaxed">{venue.description}</p>
           </div>
 
-          {/* Photo Gallery */}
           {gallery.length > 0 && (
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-[#1A1A2E] mb-3">Photos</h2>
@@ -139,7 +154,6 @@ export default function VenueDetail() {
                     <img src={img} alt={`${venue.name} photo ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform" />
                   </div>
                 ))}
-                {/* Show venue image as primary if gallery only has one */}
                 {gallery.length === 1 && venue.image && (
                   <div className="flex-shrink-0 w-60 h-40 rounded-xl overflow-hidden">
                     <img src={venue.image} alt={venue.name} className="w-full h-full object-cover hover:scale-105 transition-transform" />
@@ -149,12 +163,11 @@ export default function VenueDetail() {
             </div>
           )}
 
-          {/* Features */}
           {(venue.features as string[] || []).length > 0 && (
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-[#1A1A2E] mb-3">Features & Amenities</h2>
               <div className="flex flex-wrap gap-2">
-                {(venue.features as string[]).map((f, i) => (
+                {(venue.features as string[]).map((f: string, i: number) => (
                   <span key={i} className="flex items-center gap-1.5 bg-gray-50 rounded-full px-3 py-1.5 text-sm text-gray-600">
                     <Check className="w-3.5 h-3.5 text-green-500" />{f.replace(/-/g, ' ')}
                   </span>
@@ -163,22 +176,6 @@ export default function VenueDetail() {
             </div>
           )}
 
-          {/* Hours */}
-          {venue.hours && Object.keys(venue.hours as Record<string, string>).length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold text-[#1A1A2E] mb-3">Hours</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                {Object.entries(venue.hours as Record<string, string>).map(([day, h]) => (
-                  <div key={day} className="flex justify-between py-1.5 border-b border-gray-50 text-sm">
-                    <span className="text-gray-500 capitalize">{day}</span>
-                    <span className="font-medium text-gray-700">{h}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Contact */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-[#1A1A2E] mb-3">Contact</h2>
             <div className="space-y-2">
@@ -189,7 +186,6 @@ export default function VenueDetail() {
             </div>
           </div>
 
-          {/* Active Deals */}
           {(venue.deals || []).length > 0 && (
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-[#1A1A2E] mb-3 flex items-center gap-2">
@@ -199,11 +195,7 @@ export default function VenueDetail() {
                 {(venue.deals || []).map((deal: any) => (
                   <div key={deal.id} className="bg-gradient-to-r from-[#FF6B4A]/5 to-[#FF8F6B]/5 border border-[#FF6B4A]/10 rounded-xl p-4">
                     <span className="bg-[#FF6B4A] text-white text-xs font-bold rounded-md px-2 py-0.5">
-                      {deal.discountType === 'percentage' && `${deal.discountValue}% OFF`}
-                      {deal.discountType === 'fixed_amount' && `$${deal.discountValue} OFF`}
-                      {deal.discountType === 'bogo' && 'BOGO'}
-                      {deal.discountType === 'free_item' && 'FREE'}
-                      {!deal.discountType && (typeof deal.discount === 'string' && (deal.discount.includes('%') || deal.discount.includes('$')) ? deal.discount + ' OFF' : deal.discount)}
+                      {typeof deal.discount === 'string' && (deal.discount.includes('%') || deal.discount.includes('$')) ? deal.discount + ' OFF' : deal.discount}
                     </span>
                     <h3 className="font-semibold text-[#1A1A2E] mt-2">{deal.title}</h3>
                     <p className="text-sm text-gray-500">{deal.description}</p>
@@ -214,11 +206,10 @@ export default function VenueDetail() {
             </div>
           )}
 
-          {/* Cancellation Policy */}
           {venue.cancellationPolicy && (
             <div className="bg-gray-50 rounded-xl p-4 flex items-start gap-3 mb-6">
               {(() => {
-                const info = getCancellationInfo(venue.cancellationPolicy as string);
+                const info = getCancellationInfo(venue.cancellationPolicy as string)
                 return (
                   <>
                     <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
@@ -229,12 +220,11 @@ export default function VenueDetail() {
                       <p className="text-xs text-gray-500 mt-0.5">{info.description}</p>
                     </div>
                   </>
-                );
+                )
               })()}
             </div>
           )}
 
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
             {venue.acceptsReservations ? (
               <Button onClick={() => navigate(`/reserve/${venue.slug}`)} className="flex-1 bg-[#FF6B4A] hover:bg-[#E55A3A] text-white rounded-xl py-6 font-semibold shadow-coral">

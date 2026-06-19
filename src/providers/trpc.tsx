@@ -7,12 +7,32 @@ import type { ReactNode } from "react";
 
 export const trpc = createTRPCReact<AppRouter>();
 
-const queryClient = new QueryClient();
+// Fail-fast query client for static deployment — no retries, instant fallback
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      staleTime: Infinity,
+      gcTime: 1000 * 60 * 10,
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+});
+
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
       url: "/api/trpc",
       transformer: superjson,
+      headers() {
+        // Include local auth token for email/password users
+        const token = localStorage.getItem("companiio-local-token");
+        return token ? { "x-local-auth-token": token } : {};
+      },
       fetch(input, init) {
         return globalThis.fetch(input, {
           ...(init ?? {}),

@@ -214,6 +214,47 @@ export const waitlist = mysqlTable("waitlist", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+// Email/password credentials for local auth
+export const passwordCredentials = mysqlTable("password_credentials", {
+  id: serial("id").primaryKey(),
+  userId: bigint("userId", { mode: "number", unsigned: true }).notNull().unique(),
+  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull().$onUpdate(() => new Date()),
+});
+
+// Deal claims with QR tracking
+export const dealClaims = mysqlTable("deal_claims", {
+  id: serial("id").primaryKey(),
+  dealId: bigint("dealId", { mode: "number", unsigned: true }).notNull(),
+  userId: bigint("userId", { mode: "number", unsigned: true }).notNull(),
+  venueId: bigint("venueId", { mode: "number", unsigned: true }).notNull(),
+  qrCode: varchar("qr_code", { length: 255 }).notNull().unique(),
+  status: mysqlEnum("status", ["claimed", "redeemed", "expired", "cancelled"]).default("claimed").notNull(),
+  redeemedAt: timestamp("redeemedAt"),
+  expiresAt: timestamp("expiresAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// Booking requests sent to venues via email
+export const bookingRequests = mysqlTable("booking_requests", {
+  id: serial("id").primaryKey(),
+  venueId: bigint("venueId", { mode: "number", unsigned: true }).notNull(),
+  userName: varchar("user_name", { length: 255 }).notNull(),
+  userEmail: varchar("user_email", { length: 320 }).notNull(),
+  userPhone: varchar("user_phone", { length: 50 }),
+  date: varchar("date", { length: 20 }).notNull(),
+  time: varchar("time", { length: 10 }).notNull(),
+  partySize: int("party_size").notNull(),
+  occasion: varchar("occasion", { length: 100 }),
+  specialRequests: text("special_requests"),
+  status: mysqlEnum("status", ["pending", "confirmed", "declined"]).default("pending").notNull(),
+  emailSent: boolean("email_sent").default(false),
+  venueResponse: text("venue_response"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull().$onUpdate(() => new Date()),
+});
+
 export type User = typeof users.$inferSelect;
 export type Venue = typeof venues.$inferSelect;
 export type Reservation = typeof reservations.$inferSelect;

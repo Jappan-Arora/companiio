@@ -1,13 +1,12 @@
-import { useNavigate } from 'react-router'
+import { useNavigate, Link } from 'react-router'
 import { useState, useEffect } from 'react'
 import { useCart } from '@/hooks/useCart'
-import { trpc } from '@/providers/trpc'
 import { Button } from '@/components/ui/button'
 import {
   Search, MapPin, Star, UtensilsCrossed, Coffee, Wine, Heart, Sun,
   Gamepad2, Mountain, Music, Trophy, Palette, ArrowRight,
   CalendarDays, Users, Zap, Ticket, ChevronRight, Check,
-  Compass, Clock, ShoppingBag, Target, Sparkles,
+  Compass, Clock, ShoppingBag, Target, X, Download, Smartphone,
 } from 'lucide-react'
 import { mockCategories, mockVenues, mockDeals, mockPlans, mockCities, activityTypes } from '@/lib/mockData'
 
@@ -19,15 +18,16 @@ const iconMap: Record<string, React.ReactNode> = {
 }
 
 function SpecialOfferPopup({ onClose }: { onClose: () => void }) {
-  const { data: apiDeals } = trpc.deal.list.useQuery()
-  const deals = apiDeals && apiDeals.length > 0 ? apiDeals : mockDeals as any[]
-  const topDeal = deals?.[0]
+  const navigate = useNavigate()
+  const topDeal = mockDeals[0]
   if (!topDeal) return null
+  const venue = mockVenues.find(v => v.id === topDeal.venueId)
+  const venueSlug = venue?.slug || ''
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-      <div className="relative glass-strong rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-fade-in-up overflow-hidden" onClick={e => e.stopPropagation()}>
-        <button onClick={onClose} className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-gray-100 transition-colors z-10"><Sparkles className="w-5 h-5 text-gray-400" /></button>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative glass-strong rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-fade-in-up overflow-hidden">
+        <button onClick={onClose} className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-gray-100 transition-colors z-10"><X className="w-5 h-5 text-gray-400" /></button>
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#FF6B4A]/10 rounded-full" />
         <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-[#FF6B4A]/5 rounded-full" />
         <div className="relative">
@@ -37,10 +37,10 @@ function SpecialOfferPopup({ onClose }: { onClose: () => void }) {
           <p className="text-sm text-gray-500 mb-4">{topDeal.description}</p>
           <div className="flex items-center gap-3 mb-5">
             <span className="bg-[#FF6B4A]/10 text-[#FF6B4A] font-mono text-sm font-bold rounded-lg px-3 py-1.5">{topDeal.code}</span>
-            <span className="text-xs text-gray-400">at {topDeal.venue?.name || topDeal.venueName}</span>
+            <span className="text-xs text-gray-400">at {topDeal.venue?.name || venue?.name || 'Venue'}</span>
           </div>
           <div className="flex gap-2">
-            <Button onClick={() => { onClose(); window.location.hash = `/venue/${topDeal.venue?.slug || topDeal.venueSlug || ''}` }} className="flex-1 bg-[#FF6B4A] hover:bg-[#E55A3A] text-white rounded-xl shadow-coral">Claim Deal</Button>
+            <Link to={venueSlug ? `/venue/${venueSlug}` : '#'} onClick={onClose} className="flex-1"><Button className="w-full bg-[#FF6B4A] hover:bg-[#E55A3A] text-white rounded-xl shadow-coral">Claim Deal</Button></Link>
             <Button onClick={onClose} variant="outline" className="rounded-xl border-gray-200">Dismiss</Button>
           </div>
         </div>
@@ -55,17 +55,13 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('')
   const [heroLoaded, setHeroLoaded] = useState(false)
   const [showPopup, setShowPopup] = useState(true)
-  const { data: apiCities } = trpc.city.list.useQuery()
-  const { data: apiCategories } = trpc.category.list.useQuery()
-  const { data: apiFeatured } = trpc.venue.featured.useQuery({ limit: 8 })
-  const { data: apiDeals } = trpc.deal.list.useQuery()
-  const { data: apiPlans } = trpc.itinerary.list.useQuery({})
 
-  const cities = apiCities && apiCities.length > 0 ? apiCities : mockCities as any[]
-  const categories = apiCategories && apiCategories.length > 0 ? apiCategories : mockCategories as any[]
-  const featuredVenues = apiFeatured && apiFeatured.length > 0 ? apiFeatured : mockVenues.filter(v => v.isFeatured).slice(0, 8) as any[]
-  const deals = apiDeals && apiDeals.length > 0 ? apiDeals : mockDeals as any[]
-  const plans = apiPlans && apiPlans.length > 0 ? apiPlans : mockPlans as any[]
+  // Pure mock data — instant render, no API calls
+  const cities = mockCities as any[]
+  const categories = mockCategories as any[]
+  const featuredVenues = mockVenues.filter(v => v.isFeatured).slice(0, 8) as any[]
+  const deals = mockDeals as any[]
+  const plans = mockPlans as any[]
 
   useEffect(() => { setHeroLoaded(true) }, [])
   useEffect(() => { const timer = setTimeout(() => setShowPopup(false), 8000); return () => clearTimeout(timer) }, [])
@@ -379,6 +375,35 @@ export default function Home() {
                 <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Install App Section */}
+      <section className="py-14 bg-white border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="glass-card p-8 sm:p-10 text-center">
+            <img src="/icon-192.png" alt="Companiio App" className="w-16 h-16 rounded-2xl mx-auto mb-4 shadow-lg" />
+            <h2 className="text-xl sm:text-2xl font-bold text-[#1A1A2E] mb-2">Get the Companiio App</h2>
+            <p className="text-gray-500 text-sm max-w-md mx-auto mb-6">Install on your phone for instant access to deals, bookings, and your plans — no app store needed.</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button onClick={() => {
+                if (/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())) {
+                  alert('To install:\n1. Tap the Share button in Safari\n2. Scroll down and tap "Add to Home Screen"\n3. Tap Add')
+                } else if ('BeforeInstallPromptEvent' in window) {
+                  window.dispatchEvent(new Event('beforeinstallprompt'))
+                } else {
+                  alert('To install:\nChrome: Tap menu (3 dots) → "Install Companiio"\nSamsung: Tap menu → "Add to Home screen"')
+                }
+              }} className="bg-[#FF6B4A] hover:bg-[#E55A3A] text-white rounded-full px-6 py-5 font-semibold shadow-coral">
+                <Download className="w-5 h-5 mr-2" /> Install App
+              </Button>
+            </div>
+            <div className="flex items-center justify-center gap-6 mt-6 text-xs text-gray-400">
+              <span className="flex items-center gap-1"><Smartphone className="w-3.5 h-3.5" /> iPhone</span>
+              <span className="flex items-center gap-1"><Smartphone className="w-3.5 h-3.5" /> Android</span>
+              <span className="flex items-center gap-1"><Download className="w-3.5 h-3.5" /> No app store</span>
+            </div>
           </div>
         </div>
       </section>

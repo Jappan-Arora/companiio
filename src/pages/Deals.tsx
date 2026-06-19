@@ -2,11 +2,13 @@ import { useNavigate } from 'react-router'
 import { trpc } from '@/providers/trpc'
 import { Ticket, Copy, Check, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
-import { mockDeals } from '@/lib/mockData'
+import { mockDeals, mockVenues } from '@/lib/mockData'
 
 export default function Deals() {
   const navigate = useNavigate()
   const { data: apiDeals, isLoading } = trpc.deal.list.useQuery()
+  // Lookup venue slug from mock data for navigation
+  const getVenueSlug = (deal: any) => { const v = mockVenues.find(v => v.id === deal.venueId); return v?.slug || '' }
   const deals = apiDeals && apiDeals.length > 0 ? apiDeals : mockDeals as any[]
   const [copied, setCopied] = useState<string | null>(null)
 
@@ -39,7 +41,7 @@ export default function Deals() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute top-3 left-3 bg-[#FF6B4A] text-white text-sm font-bold rounded-xl px-3 py-1.5 shadow-coral">{label(d)}</div>
                   <div className="absolute bottom-3 left-3 right-3">
-                    <button onClick={() => navigate(`/venue/${d.venueSlug || d.venue?.slug || ''}`)} className="text-white font-semibold text-sm hover:underline flex items-center gap-1">{d.venueName || d.venue?.name}<ArrowRight className="w-3 h-3" /></button>
+                    <button onClick={() => { const slug = getVenueSlug(d); if (slug) navigate(`/venue/${slug}`) }} className="text-white font-semibold text-sm hover:underline flex items-center gap-1">{d.venueName || d.venue?.name}<ArrowRight className="w-3 h-3" /></button>
                   </div>
                 </div>
                 <div className="p-5">
@@ -53,7 +55,7 @@ export default function Deals() {
                       </div>
                     </div>
                   )}
-                  <button onClick={() => navigate(`/venue/${d.venueSlug || d.venue?.slug || ''}`)} className="w-full bg-[#FF6B4A]/10 hover:bg-[#FF6B4A]/20 text-[#FF6B4A] font-medium rounded-xl py-2.5 text-sm transition-colors flex items-center justify-center gap-1"><Ticket className="w-4 h-4" />Claim at Venue</button>
+                  <button onClick={() => { const slug = getVenueSlug(d); if (slug) navigate(`/venue/${slug}`) }} className="w-full bg-[#FF6B4A]/10 hover:bg-[#FF6B4A]/20 text-[#FF6B4A] font-medium rounded-xl py-2.5 text-sm transition-colors flex items-center justify-center gap-1"><Ticket className="w-4 h-4" />Claim at Venue</button>
                 </div>
               </div>
             ))}

@@ -260,11 +260,16 @@ export const mockDeals = [
 ];
 
 export const mockPlans = [
-  { id: 1, title: "Perfect Vancouver Date Night", slug: "vancouver-date-night", cityId: 1, description: "An unforgettable evening: Aburi sushi at Miku, a sunset walk, and cocktails at a hidden bar.", totalDuration: "5 hours", estimatedCost: "$$$", occasion: "Date Night" },
-  { id: 2, title: "Toronto Activity Day", slug: "toronto-activity-day", cityId: 2, description: "The ultimate Toronto day: axe throwing, arcade games at The Rec Room, comedy show, and late-night tapas.", totalDuration: "8 hours", estimatedCost: "$$", occasion: "Friends" },
-  { id: 3, title: "Montreal Food Tour", slug: "montreal-food-tour", cityId: 3, description: "Experience Montreal's legendary food scene: smoked meat, Middle Eastern fine dining, and French bistro.", totalDuration: "6 hours", estimatedCost: "$$", occasion: "Foodies" },
-  { id: 4, title: "Toronto Thrill Day", slug: "toronto-thrill", cityId: 2, description: "Escape rooms, axe throwing, and brewery hopping \u2014 the ultimate adventure-packed day.", totalDuration: "7 hours", estimatedCost: "$$", occasion: "Adventure" },
-  { id: 5, title: "Okanagan Wine Weekend", slug: "okanagan-wine", cityId: 8, description: "World-class wine tasting at Mission Hill, vineyard tour, and farm-to-table dining in the valley.", totalDuration: "6 hours", estimatedCost: "$$$", occasion: "Romance" },
+  { id: 1, title: "Perfect Vancouver Date Night", slug: "vancouver-date-night", cityId: 1, description: "An unforgettable evening: Aburi sushi at Miku, a sunset walk, and cocktails at a hidden bar.", totalDuration: "5 hours", estimatedCost: "$$$", occasion: "Date Night",
+    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=500&fit=crop" },
+  { id: 2, title: "Toronto Activity Day", slug: "toronto-activity-day", cityId: 2, description: "The ultimate Toronto day: axe throwing, arcade games at The Rec Room, comedy show, and late-night tapas.", totalDuration: "8 hours", estimatedCost: "$$", occasion: "Friends",
+    image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&h=500&fit=crop" },
+  { id: 3, title: "Montreal Food Tour", slug: "montreal-food-tour", cityId: 3, description: "Experience Montreal's legendary food scene: smoked meat, Middle Eastern fine dining, and French bistro.", totalDuration: "6 hours", estimatedCost: "$$", occasion: "Foodies",
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=500&fit=crop" },
+  { id: 4, title: "Toronto Thrill Day", slug: "toronto-thrill", cityId: 2, description: "Escape rooms, axe throwing, and brewery hopping \u2014 the ultimate adventure-packed day.", totalDuration: "7 hours", estimatedCost: "$$", occasion: "Adventure",
+    image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=800&h=500&fit=crop" },
+  { id: 5, title: "Okanagan Wine Weekend", slug: "okanagan-wine", cityId: 8, description: "World-class wine tasting at Mission Hill, vineyard tour, and farm-to-table dining in the valley.", totalDuration: "6 hours", estimatedCost: "$$$", occasion: "Romance",
+    image: "https://images.unsplash.com/photo-1516594915307-8f73ba37d2ba?w=800&h=500&fit=crop" },
 ];
 
 export const mockPlanItems = [

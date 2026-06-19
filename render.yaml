@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: companiio
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: APP_SECRET
+        generateValue: true
+    healthCheckPath: /api/trpc/ping

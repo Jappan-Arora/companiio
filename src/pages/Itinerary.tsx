@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router'
 import { trpc } from '@/providers/trpc'
-import { Clock, DollarSign, ArrowRight, CalendarDays } from 'lucide-react'
+import { Clock, DollarSign, ArrowRight, CalendarDays, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { mockPlans } from '@/lib/mockData'
 
 export default function Itinerary() {
@@ -18,6 +19,12 @@ export default function Itinerary() {
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-[#1A1A2E] mb-2">1-Day Plans</h1>
           <p className="text-gray-500 max-w-lg mx-auto">Full-day itineraries planned for you. Restaurant, activity, cafe, dinner, and more all mapped out.</p>
+          <Button
+            onClick={() => navigate('/create-plan')}
+            className="mt-4 bg-[#FF6B4A] hover:bg-[#E55A3A] text-white rounded-full px-6 shadow-coral"
+          >
+            <Plus className="w-4 h-4 mr-2" /> Create Your Own Plan
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
